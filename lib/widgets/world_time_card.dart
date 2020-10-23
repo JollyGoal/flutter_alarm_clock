@@ -79,56 +79,62 @@ class _WorldTimeCardState extends State<WorldTimeCard> {
         child: Container(
           height: widget.height,
           width: double.infinity,
-          color: Palette.cardBackground,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.worldTime.name,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.getFont(
-                          'Electrolize',
-                          textStyle: const TextStyle(
-                            fontSize: 20,
-                            letterSpacing: 0.2,
-                            fontWeight: FontWeight.w600,
+          child: Material(
+            color: Palette.cardBackground,
+            borderRadius: BorderRadius.circular(30.0),
+            child: InkWell(
+              onTap: () {},
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.worldTime.name,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.getFont(
+                              'Electrolize',
+                              textStyle: const TextStyle(
+                                fontSize: 20,
+                                letterSpacing: 0.2,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 8.0),
-                      Text(
-                        _offsetString,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.getFont(
-                          'Electrolize',
-                          textStyle: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                          const SizedBox(height: 8.0),
+                          Text(
+                            _offsetString,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.getFont(
+                              'Electrolize',
+                              textStyle: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                Text(
-                  _digits,
-                  style: GoogleFonts.getFont(
-                    'Electrolize',
-                    textStyle: const TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w500,
                     ),
-                  ),
+                    Text(
+                      _digits,
+                      style: GoogleFonts.getFont(
+                        'Electrolize',
+                        textStyle: const TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
