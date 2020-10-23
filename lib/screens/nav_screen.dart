@@ -12,7 +12,7 @@ class _NavScreenState extends State<NavScreen> {
   final Map<String, Widget> _screens = {
     'Clock': ClockScreen(key: PageStorageKey('clockScreen')),
     'Alarm': AlarmScreen(key: PageStorageKey('alarmScreen')),
-    'Stopwatch': Text("Stopwatch"),
+    'Stopwatch': StopWatchScreen(key: PageStorageKey('stopwatchScreen')),
     'Timer': Text("Timer"),
   };
   final _tabBarKey = GlobalKey();
