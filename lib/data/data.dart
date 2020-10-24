@@ -37,3 +37,5 @@ List<Alarm> alarmsList = [
   Alarm(isEnabled: false, time: "4:30", daysOfWeek: [DateTime.friday]),
   Alarm(isEnabled: true, time: "11:30"),
 ];
+
+List<Lap> lapsList = [];

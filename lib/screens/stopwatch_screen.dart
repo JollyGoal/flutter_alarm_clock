@@ -2,45 +2,54 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_alarm_clock/config/palette.dart';
+import 'package:flutter_alarm_clock/data/data.dart';
+import 'package:flutter_alarm_clock/data/models/models.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-enum StopWatchStatus {
-  initial,
-  paused,
-  running,
-}
+Stopwatch _stopwatchMain = Stopwatch();
+StopwatchStatus _stopwatchStatus = StopwatchStatus.initial;
 
-class StopWatchScreen extends StatefulWidget {
-  const StopWatchScreen({Key key}) : super(key: key);
+class StopwatchScreen extends StatefulWidget {
+  const StopwatchScreen({Key key}) : super(key: key);
 
   @override
-  _StopWatchScreenState createState() => _StopWatchScreenState();
+  _StopwatchScreenState createState() => _StopwatchScreenState();
 }
 
-class _StopWatchScreenState extends State<StopWatchScreen> {
-  Timer _timer;
-  Stopwatch _stopwatch;
-  StopWatchStatus _stopwatchStatus;
+class _StopwatchScreenState extends State<StopwatchScreen> {
   static const Duration _timerTick = const Duration(milliseconds: 10);
-  String _minutesSeconds;
-
-  @override
-  void initState() {
-    _stopwatchStatus = StopWatchStatus.initial;
-    _stopwatch = Stopwatch();
-    super.initState();
-  }
+  Timer _timer;
 
   void setTime(Timer timer) {
+    // print('tick');
     setState(() {});
   }
 
-  // @override
-  // void dispose() {
-  //   _timer.cancel();
-  //   _stopwatch.reset();
-  //   super.dispose();
-  // }
+  Future<void> addLap() async {
+    lapsList.add(
+      Lap(
+        id: lapsList.length,
+        overallTime: _stopwatchMain.elapsed,
+      ),
+    );
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    if (_stopwatchMain.isRunning && (_timer == null || !_timer.isActive)) {
+      _timer = Timer.periodic(_timerTick, setTime);
+    }
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    try {
+      _timer.cancel();
+    } catch (e) {}
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,60 +59,46 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
-            child: Container(
-              height: 180.0,
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                runAlignment: WrapAlignment.end,
-                children: [
-                  _stopwatch.elapsed.inHours != 0
-                      ? SizedBox(
-                          width: 78,
-                          child: Text(
-                            _stopwatch.elapsed.inHours
-                                    .toString()
-                                    .padLeft(2, "0") +
-                                ":",
-                            textAlign: TextAlign.end,
-                            style: GoogleFonts.getFont(
-                              'Electrolize',
-                              textStyle: const TextStyle(
-                                fontSize: 50,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        )
-                      : SizedBox.shrink(),
-                  _stopwatch.elapsed.inHours != 0 ? Text(
-                    ":",
-                    style: GoogleFonts.getFont(
-                      'Electrolize',
-                      textStyle: const TextStyle(
-                        fontSize: 50,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ) : SizedBox.shrink(),
-                  SizedBox(
-                    width: 78,
-                    child: Text(
-                      (_stopwatch.elapsed.inMinutes -
-                              (60 * _stopwatch.elapsed.inHours))
-                          .toString()
-                          .padLeft(2, "0"),
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.getFont(
-                        'Electrolize',
-                        textStyle: const TextStyle(
-                          fontSize: 50,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Text(
-                    ":",
+            child: buildStopwatchFace(),
+          ),
+          SliverToBoxAdapter(
+            child: lapsList.isNotEmpty ? buildLapsBloc() : SizedBox.shrink(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildLapsBloc() {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 8.0,
+      runSpacing: 18.0,
+      children: lapsList
+          .map((worldTime) => Container(
+                height: 120,
+                width: 200,
+                color: Colors.red,
+              ))
+          .toList(),
+    );
+  }
+
+  Widget buildStopwatchFace() {
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 140),
+      height: lapsList.isNotEmpty ? 100.0 : 180.0,
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        runAlignment: WrapAlignment.end,
+        children: [
+          _stopwatchMain.elapsed.inHours != 0
+              ? SizedBox(
+                  width: 78,
+                  child: Text(
+                    _stopwatchMain.elapsed.inHours.toString().padLeft(2, "0") +
+                        ":",
+                    textAlign: TextAlign.end,
                     style: GoogleFonts.getFont(
                       'Electrolize',
                       textStyle: const TextStyle(
@@ -112,62 +107,93 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 78,
-                    child: Text(
-                      (_stopwatch.elapsed.inSeconds -
-                              (60 * _stopwatch.elapsed.inMinutes))
-                          .toString()
-                          .padLeft(2, "0"),
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.getFont(
-                        'Electrolize',
-                        textStyle: const TextStyle(
-                          fontSize: 50,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
+                )
+              : SizedBox.shrink(),
+          _stopwatchMain.elapsed.inHours != 0
+              ? Text(
+                  ":",
+                  style: GoogleFonts.getFont(
+                    'Electrolize',
+                    textStyle: const TextStyle(
+                      fontSize: 50,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  Text(
-                    ".",
-                    style: GoogleFonts.getFont(
-                      'Electrolize',
-                      textStyle: const TextStyle(
-                        fontSize: 50,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 78,
-                    child: Text(
-                      _stopwatch.elapsed.inMilliseconds.toString().length > 2
-                          ? _stopwatch.elapsed.inMilliseconds
-                                  .toString()
-                                  .substring(
-                                      _stopwatch.elapsed.inMilliseconds
-                                              .toString()
-                                              .length -
-                                          3,
-                                      _stopwatch.elapsed.inMilliseconds
-                                              .toString()
-                                              .length -
-                                          1)
-                          : _stopwatch.elapsed.inMilliseconds
-                                  .toString()
-                                  .padLeft(2, "0"),
-                      textAlign: TextAlign.start,
-                      style: GoogleFonts.getFont(
-                        'Electrolize',
-                        textStyle: const TextStyle(
-                          fontSize: 50,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                )
+              : SizedBox.shrink(),
+          SizedBox(
+            width: 78,
+            child: Text(
+              (_stopwatchMain.elapsed.inMinutes -
+                      (60 * _stopwatchMain.elapsed.inHours))
+                  .toString()
+                  .padLeft(2, "0"),
+              textAlign: TextAlign.center,
+              style: GoogleFonts.getFont(
+                'Electrolize',
+                textStyle: const TextStyle(
+                  fontSize: 50,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+          Text(
+            ":",
+            style: GoogleFonts.getFont(
+              'Electrolize',
+              textStyle: const TextStyle(
+                fontSize: 50,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 78,
+            child: Text(
+              (_stopwatchMain.elapsed.inSeconds -
+                      (60 * _stopwatchMain.elapsed.inMinutes))
+                  .toString()
+                  .padLeft(2, "0"),
+              textAlign: TextAlign.center,
+              style: GoogleFonts.getFont(
+                'Electrolize',
+                textStyle: const TextStyle(
+                  fontSize: 50,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+          Text(
+            ".",
+            style: GoogleFonts.getFont(
+              'Electrolize',
+              textStyle: const TextStyle(
+                fontSize: 50,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 78,
+            child: Text(
+              _stopwatchMain.elapsed.inMilliseconds.toString().length > 2
+                  ? _stopwatchMain.elapsed.inMilliseconds.toString().substring(
+                      _stopwatchMain.elapsed.inMilliseconds.toString().length -
+                          3,
+                      _stopwatchMain.elapsed.inMilliseconds.toString().length -
+                          1)
+                  : _stopwatchMain.elapsed.inMilliseconds
+                      .toString()
+                      .padLeft(2, "0"),
+              textAlign: TextAlign.start,
+              style: GoogleFonts.getFont(
+                'Electrolize',
+                textStyle: const TextStyle(
+                  fontSize: 50,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ),
@@ -189,7 +215,7 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
         children: [
           AnimatedContainer(
             transform: Matrix4.translationValues(
-              _stopwatchStatus == StopWatchStatus.initial
+              _stopwatchStatus == StopwatchStatus.initial
                   ? -_translateValue
                   : 0.0,
               0.0,
@@ -199,13 +225,14 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
             width: _btnWidth,
             child: FlatButton(
               onPressed: () {
-                if (_stopwatchStatus == StopWatchStatus.running) {
-                  /// TODO create LAP
-                } else if (_stopwatchStatus == StopWatchStatus.paused) {
+                if (_stopwatchStatus == StopwatchStatus.running) {
+                  addLap();
+                } else if (_stopwatchStatus == StopwatchStatus.paused) {
                   setState(() {
-                    _stopwatchStatus = StopWatchStatus.initial;
-                    _stopwatch.reset();
-                    // _timer.cancel();
+                    _stopwatchStatus = StopwatchStatus.initial;
+                    _stopwatchMain.reset();
+                    lapsList = [];
+                    _timer.cancel();
                   });
                 }
               },
@@ -216,11 +243,7 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
                 borderRadius: BorderRadius.circular(50.0),
               ),
               child: Text(
-                (_stopwatchStatus == StopWatchStatus.initial)
-                    ? ""
-                    : (_stopwatchStatus == StopWatchStatus.paused)
-                        ? "RESET"
-                        : "LAP",
+                (_stopwatchStatus == StopwatchStatus.paused) ? "RESET" : "LAP",
                 style: GoogleFonts.getFont(
                   'Electrolize',
                   textStyle: const TextStyle(
@@ -237,7 +260,7 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
             duration: _duration,
             width: _btnWidth,
             transform: Matrix4.translationValues(
-              _stopwatchStatus == StopWatchStatus.initial
+              _stopwatchStatus == StopwatchStatus.initial
                   ? _translateValue
                   : 0.0,
               0.0,
@@ -245,23 +268,18 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
             ),
             child: FlatButton(
               onPressed: () {
-                if (_stopwatchStatus == StopWatchStatus.initial) {
+                if (_stopwatchStatus == StopwatchStatus.initial ||
+                    _stopwatchStatus == StopwatchStatus.paused) {
                   setState(() {
-                    _stopwatchStatus = StopWatchStatus.running;
-                    _stopwatch.start();
-                    _timer = Timer.periodic(_timerTick, setTime);
-                  });
-                } else if (_stopwatchStatus == StopWatchStatus.paused) {
-                  setState(() {
-                    _stopwatchStatus = StopWatchStatus.running;
-                    _stopwatch.start();
+                    _stopwatchStatus = StopwatchStatus.running;
+                    _stopwatchMain.start();
                     _timer = Timer.periodic(_timerTick, setTime);
                   });
                 } else {
                   setState(() {
-                    _stopwatchStatus = StopWatchStatus.paused;
-                    _stopwatch.stop();
-                    // _timer.cancel();
+                    _stopwatchStatus = StopwatchStatus.paused;
+                    _stopwatchMain.stop();
+                    _timer.cancel();
                   });
                 }
               },
@@ -272,9 +290,9 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
                 borderRadius: BorderRadius.circular(50.0),
               ),
               child: Text(
-                (_stopwatchStatus == StopWatchStatus.initial)
+                (_stopwatchStatus == StopwatchStatus.initial)
                     ? "START"
-                    : (_stopwatchStatus == StopWatchStatus.paused)
+                    : (_stopwatchStatus == StopwatchStatus.paused)
                         ? "RESUME"
                         : "STOP",
                 style: GoogleFonts.getFont(
