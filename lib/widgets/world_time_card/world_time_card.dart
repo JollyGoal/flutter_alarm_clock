@@ -1,12 +1,11 @@
-import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_alarm_clock/config/palette.dart';
 import 'package:flutter_alarm_clock/data/models/models.dart';
+import 'package:flutter_alarm_clock/widgets/world_time_card/world_time_clock_face.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class WorldTimeCard extends StatefulWidget {
+class WorldTimeCard extends StatelessWidget {
   final WorldTime worldTime;
   final double height;
   final Duration updateDuration;
@@ -19,65 +18,15 @@ class WorldTimeCard extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _WorldTimeCardState createState() => _WorldTimeCardState();
-}
-
-class _WorldTimeCardState extends State<WorldTimeCard> {
-  Timer _timer;
-  DateTime _dateTime;
-  String _digits;
-  String _offsetString;
-
-  @override
-  void initState() {
-    _offsetString =
-        "UTC ${widget.worldTime.utcOffset.sign}${widget.worldTime.utcOffset.hours.toString().padLeft(2, '0')}:${widget.worldTime.utcOffset.minutes.toString().padLeft(2, '0')}";
-
-    _dateTime = DateTime.now().toUtc();
-    widget.worldTime.utcOffset.sign == "+"
-        ? _dateTime = _dateTime.add(Duration(
-            hours: widget.worldTime.utcOffset.hours,
-            minutes: widget.worldTime.utcOffset.minutes))
-        : _dateTime = _dateTime.subtract(Duration(
-            hours: widget.worldTime.utcOffset.hours,
-            minutes: widget.worldTime.utcOffset.minutes));
-
-    _digits =
-        '${_dateTime.hour.toString().padLeft(2, '0')}:${_dateTime.minute.toString().padLeft(2, '0')}';
-
-    super.initState();
-    this._timer = Timer.periodic(widget.updateDuration, setTime);
-  }
-
-  void setTime(Timer timer) {
-    setState(() {
-      _dateTime = DateTime.now().toUtc();
-      widget.worldTime.utcOffset.sign == "+"
-          ? _dateTime = _dateTime.add(Duration(
-              hours: widget.worldTime.utcOffset.hours,
-              minutes: widget.worldTime.utcOffset.minutes))
-          : _dateTime = _dateTime.subtract(Duration(
-              hours: widget.worldTime.utcOffset.hours,
-              minutes: widget.worldTime.utcOffset.minutes));
-      _digits =
-          '${_dateTime.hour.toString().padLeft(2, '0')}:${_dateTime.minute.toString().padLeft(2, '0')}';
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    String _offsetString =
+        "UTC ${worldTime.utcOffset.sign}${worldTime.utcOffset.hours.toString().padLeft(2, '0')}:${worldTime.utcOffset.minutes.toString().padLeft(2, '0')}";
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30),
         child: Container(
-          height: widget.height,
+          height: height,
           width: double.infinity,
           child: Material(
             color: Palette.cardBackground,
@@ -94,7 +43,7 @@ class _WorldTimeCardState extends State<WorldTimeCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.worldTime.name,
+                            worldTime.name,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.getFont(
@@ -122,16 +71,7 @@ class _WorldTimeCardState extends State<WorldTimeCard> {
                         ],
                       ),
                     ),
-                    Text(
-                      _digits,
-                      style: GoogleFonts.getFont(
-                        'Electrolize',
-                        textStyle: const TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
+                    WorldTimeClockFace(utcOffset: worldTime.utcOffset),
                   ],
                 ),
               ),

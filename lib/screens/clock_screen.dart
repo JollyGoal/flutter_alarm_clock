@@ -4,14 +4,9 @@ import 'package:flutter_alarm_clock/data/data.dart';
 import 'package:flutter_alarm_clock/widgets/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ClockScreen extends StatefulWidget {
+class ClockScreen extends StatelessWidget {
   const ClockScreen({Key key}) : super(key: key);
 
-  @override
-  _ClockScreenState createState() => _ClockScreenState();
-}
-
-class _ClockScreenState extends State<ClockScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

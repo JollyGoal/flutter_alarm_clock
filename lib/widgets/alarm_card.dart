@@ -22,7 +22,6 @@ class AlarmCard extends StatefulWidget {
 
 class _AlarmCardState extends State<AlarmCard> {
   final List<int> _allDays = [1, 2, 3, 4, 5, 6, 7];
-  String _daysOfWeek;
 
   String defineDays(int index) {
     switch (index) {
@@ -71,7 +70,6 @@ class _AlarmCardState extends State<AlarmCard> {
   @override
   void initState() {
     if (widget.alarm.daysOfWeek != null && widget.alarm.daysOfWeek.length > 0) {
-
     } else {
       widget.alarm.isEnabled = false;
     }
