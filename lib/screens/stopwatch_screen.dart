@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_alarm_clock/config/palette.dart';
 import 'package:flutter_alarm_clock/data/data.dart';
 import 'package:flutter_alarm_clock/data/models/models.dart';
@@ -14,6 +15,8 @@ class StopwatchScreen extends StatefulWidget {
 }
 
 class _StopwatchScreenState extends State<StopwatchScreen> {
+  ScrollController _scrollController = ScrollController(keepScrollOffset: true);
+
   Future<void> addLap() async {
     lapsList.add(
       Lap(
@@ -21,6 +24,15 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
         overallTime: stopwatchMain.elapsed,
       ),
     );
+    setState(() {});
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 200), curve: Curves.linear);
+    });
+  }
+
+  Future<void> removeLap(int index) async {
+    lapsList.removeAt(index);
     setState(() {});
   }
 
@@ -39,38 +51,42 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
         addLap: () => addLap(),
         clearLapsList: () => clearLapsList(),
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: AnimatedContainer(
-              duration: Duration(milliseconds: 140),
-              height: lapsList.isNotEmpty ? 100.0 : 180.0,
-              child: StopwatchFace(
-                stopwatchMain: stopwatchMain,
-                stopwatchStateController: stopwatchState,
-              ),
+      body: Column(
+        children: [
+          AnimatedContainer(
+            width: double.infinity,
+            duration: const Duration(milliseconds: 140),
+            height: lapsList.isNotEmpty ? 100.0 : 180.0,
+            child: StopwatchFace(
+              stopwatchMain: stopwatchMain,
+              stopwatchStateController: stopwatchState,
             ),
           ),
-          SliverToBoxAdapter(
-            child: lapsList.isNotEmpty ? buildLapsBloc() : SizedBox.shrink(),
-          ),
+          lapsList.isNotEmpty ? buildLapsBloc() : SizedBox.shrink(),
         ],
       ),
     );
   }
 
   Widget buildLapsBloc() {
-    return Wrap(
-      alignment: WrapAlignment.center,
-      spacing: 8.0,
-      runSpacing: 18.0,
-      children: lapsList
-          .map((lap) => Container(
-                height: 120,
-                width: 200,
-                color: Colors.red,
-              ))
-          .toList(),
+    final double _height = MediaQuery.of(context).size.height - 50 - 201;
+    return Container(
+      height: _height - (lapsList.length >= 2 ? 100 : 180),
+      width: double.infinity,
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        padding: const EdgeInsets.only(top: 50.0, bottom: 30.0),
+        child: Wrap(
+          alignment: WrapAlignment.spaceEvenly,
+          runSpacing: 18.0,
+          children: lapsList.asMap().entries
+              .map((entry) => LapCard(
+                    lap: entry.value,
+                    removeLap: () => removeLap(entry.key),
+                  ))
+              .toList(),
+        ),
+      ),
     );
   }
 }

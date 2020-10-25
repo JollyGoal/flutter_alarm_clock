@@ -42,6 +42,8 @@ List<Alarm> alarmsList = [
 
 List<Lap> lapsList = [];
 
+StreamController<List<Lap>> lapsController = StreamController<List<Lap>>();
+
 StreamController<StopwatchStatus> stopwatchState = StreamController<StopwatchStatus>.broadcast();
 
 StopwatchStatus stopwatchStatus = StopwatchStatus.initial;

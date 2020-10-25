@@ -67,8 +67,7 @@ class _StopwatchFaceState extends State<StopwatchFace> {
                 child: Text(
                   widget.stopwatchMain.elapsed.inHours
                           .toString()
-                          .padLeft(2, "0") +
-                      ":",
+                          .padLeft(2, "0"),
                   textAlign: TextAlign.end,
                   style: GoogleFonts.getFont(
                     'Electrolize',
