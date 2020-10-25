@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'models/models.dart';
 
 List<WorldTime> worldTimeList = [
@@ -39,3 +41,9 @@ List<Alarm> alarmsList = [
 ];
 
 List<Lap> lapsList = [];
+
+StreamController<StopwatchStatus> stopwatchState = StreamController<StopwatchStatus>.broadcast();
+
+StopwatchStatus stopwatchStatus = StopwatchStatus.initial;
+
+Stopwatch stopwatchMain = Stopwatch();
