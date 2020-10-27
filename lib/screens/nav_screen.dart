@@ -13,7 +13,7 @@ class _NavScreenState extends State<NavScreen> {
     'Clock': ClockScreen(key: PageStorageKey('clockScreen')),
     'Alarm': AlarmScreen(key: PageStorageKey('alarmScreen')),
     'Stopwatch': StopwatchScreen(key: PageStorageKey('stopwatchScreen')),
-    'Timer': Text("Timer"),
+    'Timer': TimerScreen(key: PageStorageKey('timerScreen')),
   };
   final _tabBarKey = GlobalKey();
 
@@ -45,7 +45,7 @@ class _NavScreenState extends State<NavScreen> {
   void initState() {
     _activePage = keys[0];
     _scrollController = ScrollController(keepScrollOffset: true);
-    _pageController = PageController(keepPage: true, initialPage: 0);
+    _pageController = PageController(keepPage: true, initialPage: 3);
     super.initState();
   }
 

@@ -6,62 +6,48 @@ import 'package:flutter_alarm_clock/data/data.dart';
 import 'package:flutter_alarm_clock/data/models/models.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class StopwatchBottom extends StatefulWidget {
-  final Stopwatch stopwatchMain;
-  final StreamController<StopwatchStatus> stopwatchStateController;
-  final Function addLap;
-  final Function clearLapsList;
+class TimerBottom extends StatefulWidget {
+  final StreamController<TimerStatus> timerStateController;
+  final Function(TimerAction) handleTimer;
 
-  const StopwatchBottom({
+  const TimerBottom({
     Key key,
-    @required this.stopwatchMain,
-    @required this.stopwatchStateController,
-    @required this.addLap,
-    @required this.clearLapsList,
+    @required this.timerStateController,
+    @required this.handleTimer,
   }) : super(key: key);
 
   @override
   _StopwatchBottomState createState() => _StopwatchBottomState();
 }
 
-class _StopwatchBottomState extends State<StopwatchBottom> {
-  StreamSubscription _stopwatchSubscription;
-
-  void handleStopwatchBottomUpdate(StopwatchStatus state) {
-    setState(() {
-      stopwatchStatus = state;
-    });
-  }
+class _StopwatchBottomState extends State<TimerBottom> {
+  StreamSubscription _timerSubscription;
 
   @override
   void initState() {
+    _timerSubscription = widget.timerStateController.stream.listen((state) {
+      timerStatus = state;
+      try {
+        setState(() {});
+      } catch (e) {}
+    });
     super.initState();
-    _stopwatchSubscription = widget.stopwatchStateController.stream
-        .listen((state) => handleStopwatchBottomUpdate(state));
   }
 
-  Future<void> handleSecondaryBtnPress() async {
-    if (stopwatchStatus == StopwatchStatus.running) {
-      widget.addLap();
-    } else if (stopwatchStatus == StopwatchStatus.paused) {
-      widget.stopwatchMain.reset();
-      widget.stopwatchStateController.add(StopwatchStatus.initial);
-      widget.clearLapsList();
-      setState(() {});
-    }
+  Future<void> handleCancelBtnPress() async {
+    widget.handleTimer(TimerAction.cancel);
+    setState(() {});
   }
 
   Future<void> handlePrimaryBtnPress() async {
-    if (stopwatchStatus == StopwatchStatus.initial ||
-        stopwatchStatus == StopwatchStatus.paused) {
+    if (timerStatus == TimerStatus.initial ||
+        timerStatus == TimerStatus.paused) {
       setState(() {
-        widget.stopwatchMain.start();
-        widget.stopwatchStateController.add(StopwatchStatus.running);
+        widget.handleTimer(TimerAction.run);
       });
     } else {
       setState(() {
-        widget.stopwatchMain.stop();
-        widget.stopwatchStateController.add(StopwatchStatus.paused);
+        widget.handleTimer(TimerAction.pause);
       });
     }
   }
@@ -80,9 +66,7 @@ class _StopwatchBottomState extends State<StopwatchBottom> {
         children: [
           AnimatedContainer(
             transform: Matrix4.translationValues(
-              stopwatchStatus == StopwatchStatus.initial
-                  ? -_translateValue
-                  : 0.0,
+              timerStatus == TimerStatus.initial ? -_translateValue : 0.0,
               0.0,
               0.0,
             ),
@@ -90,7 +74,7 @@ class _StopwatchBottomState extends State<StopwatchBottom> {
             width: _btnWidth,
             child: FlatButton(
               onPressed: () {
-                handleSecondaryBtnPress();
+                handleCancelBtnPress();
               },
               padding: const EdgeInsets.symmetric(vertical: 20),
               color: Palette.tertiaryButton,
@@ -99,7 +83,7 @@ class _StopwatchBottomState extends State<StopwatchBottom> {
                 borderRadius: BorderRadius.circular(50.0),
               ),
               child: Text(
-                (stopwatchStatus == StopwatchStatus.paused) ? "RESET" : "LAP",
+                "CANCEL",
                 style: GoogleFonts.getFont(
                   'Electrolize',
                   textStyle: const TextStyle(
@@ -116,9 +100,7 @@ class _StopwatchBottomState extends State<StopwatchBottom> {
             duration: _duration,
             width: _btnWidth,
             transform: Matrix4.translationValues(
-              stopwatchStatus == StopwatchStatus.initial
-                  ? _translateValue
-                  : 0.0,
+              timerStatus == TimerStatus.initial ? _translateValue : 0.0,
               0.0,
               0.0,
             ),
@@ -133,11 +115,9 @@ class _StopwatchBottomState extends State<StopwatchBottom> {
                 borderRadius: BorderRadius.circular(50.0),
               ),
               child: Text(
-                (stopwatchStatus == StopwatchStatus.initial)
+                (timerStatus == TimerStatus.initial)
                     ? "START"
-                    : (stopwatchStatus == StopwatchStatus.paused)
-                        ? "RESUME"
-                        : "STOP",
+                    : (timerStatus == TimerStatus.paused) ? "RESUME" : "PAUSE",
                 style: GoogleFonts.getFont(
                   'Electrolize',
                   textStyle: const TextStyle(
@@ -156,7 +136,9 @@ class _StopwatchBottomState extends State<StopwatchBottom> {
 
   @override
   void dispose() {
-    _stopwatchSubscription?.cancel();
+    if (timerStatus != TimerStatus.running) {
+      _timerSubscription?.cancel();
+    }
     super.dispose();
   }
 }

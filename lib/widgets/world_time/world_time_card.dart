@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_alarm_clock/config/palette.dart';
 import 'package:flutter_alarm_clock/data/models/models.dart';
-import 'package:flutter_alarm_clock/widgets/world_time_card/world_time_clock_face.dart';
+import 'package:flutter_alarm_clock/widgets/world_time/world_time_clock_face.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class WorldTimeCard extends StatelessWidget {

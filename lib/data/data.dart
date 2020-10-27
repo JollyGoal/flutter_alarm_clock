@@ -40,12 +40,28 @@ List<Alarm> alarmsList = [
   Alarm(isEnabled: true, time: "11:30"),
 ];
 
+/// Stopwatch
 List<Lap> lapsList = [];
 
-StreamController<List<Lap>> lapsController = StreamController<List<Lap>>();
-
-StreamController<StopwatchStatus> stopwatchState = StreamController<StopwatchStatus>.broadcast();
+StreamController<StopwatchStatus> stopwatchState =
+    StreamController<StopwatchStatus>.broadcast();
 
 StopwatchStatus stopwatchStatus = StopwatchStatus.initial;
 
 Stopwatch stopwatchMain = Stopwatch();
+
+/// Timer
+
+StreamController<TimerStatus> timerState =
+    StreamController<TimerStatus>.broadcast();
+
+TimerStatus timerStatus = TimerStatus.initial;
+
+int countdownSeconds = 0;
+
+int get getCountdownSeconds => countdownSeconds;
+
+/// TODO Following preferred values should be saved in shared_preferences
+int prefHour = 0;
+int prefMin = 0;
+int prefSec = 0;
