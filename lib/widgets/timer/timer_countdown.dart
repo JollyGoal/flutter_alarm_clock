@@ -1,10 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_alarm_clock/config/palette.dart';
 import 'package:flutter_alarm_clock/data/data.dart';
 import 'package:flutter_alarm_clock/data/models/models.dart';
 
 import '../widgets.dart';
+
+const PI = 3.14;
 
 class TimerCountdown extends StatefulWidget {
   final StreamController<TimerStatus> timerStateController;
@@ -31,7 +34,7 @@ class _TimerCountdownState extends State<TimerCountdown> {
         _timer?.cancel();
         break;
       case TimerStatus.running:
-        _timer = Timer.periodic(Duration(seconds: 1), (_) {
+        _timer = Timer.periodic(Duration(milliseconds: 100), (_) {
           try {
             setState(() {});
           } catch (e) {}
@@ -52,45 +55,69 @@ class _TimerCountdownState extends State<TimerCountdown> {
   Widget build(BuildContext context) {
     final Duration elapsed = Duration(seconds: getCountdownSeconds);
     return Center(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 48),
-            child: SizedBox(
-              width: 70,
-              child: TimerPickerElem(
-                  label: elapsed.inHours.toString().padLeft(2, "0")),
+          RotatedBox(
+            quarterTurns: -1,
+            child: ShaderMask(
+              shaderCallback: (rect) {
+                // final double value = getCountdownSeconds != getPrefInSeconds
+                //     ? getCountdownSeconds / getPrefInSeconds
+                //     : 0;
+                final double value = getCountdownSeconds / getPrefInSeconds;
+                return SweepGradient(
+                    startAngle: 0.0,
+                    endAngle: 2 * PI,
+                    stops: [value, value],
+                    center: Alignment.center,
+                    colors: [
+                      Palette.primaryButton,
+                      Palette.secondaryButton
+                    ]).createShader(rect);
+              },
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                        image: Image.asset("assets/radial_scale.png").image)),
+              ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 55),
-            child: TimerPickerElem(label: ":"),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 48),
-            child: SizedBox(
-              width: 70,
-              child: TimerPickerElem(
-                  label: (elapsed.inMinutes - (60 * elapsed.inHours))
-                      .toString()
-                      .padLeft(2, "0")),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 55),
-            child: TimerPickerElem(label: ":"),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 48),
-            child: SizedBox(
-              width: 70,
-              child: TimerPickerElem(
-                  label: (elapsed.inSeconds - (60 * elapsed.inMinutes))
-                      .toString()
-                      .padLeft(2, "0")),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 70,
+                child: TimerPickerElem(
+                    label: elapsed.inHours.toString().padLeft(2, "0")),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 7),
+                child: TimerPickerElem(label: ":"),
+              ),
+              SizedBox(
+                width: 70,
+                child: TimerPickerElem(
+                    label: (elapsed.inMinutes - (60 * elapsed.inHours))
+                        .toString()
+                        .padLeft(2, "0")),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 7),
+                child: TimerPickerElem(label: ":"),
+              ),
+              SizedBox(
+                width: 70,
+                child: TimerPickerElem(
+                    label: (elapsed.inSeconds - (60 * elapsed.inMinutes))
+                        .toString()
+                        .padLeft(2, "0")),
+              ),
+            ],
           ),
         ],
       ),

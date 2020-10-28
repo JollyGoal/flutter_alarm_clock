@@ -65,3 +65,6 @@ int get getCountdownSeconds => countdownSeconds;
 int prefHour = 0;
 int prefMin = 0;
 int prefSec = 0;
+
+int get getPrefInSeconds =>
+    Duration(hours: prefHour, minutes: prefMin, seconds: prefSec).inSeconds;

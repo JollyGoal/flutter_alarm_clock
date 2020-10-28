@@ -28,8 +28,7 @@ class _TimerScreenState extends State<TimerScreen> {
         prefSec = value;
         break;
     }
-    countdownSeconds =
-        Duration(seconds: prefSec, minutes: prefMin, hours: prefHour).inSeconds;
+    countdownSeconds = getPrefInSeconds;
   }
 
   void handleTick(Timer timer) {
@@ -46,16 +45,12 @@ class _TimerScreenState extends State<TimerScreen> {
     switch (action) {
       case TimerAction.cancel:
         _timer?.cancel();
-        countdownSeconds =
-            Duration(seconds: prefSec, minutes: prefMin, hours: prefHour)
-                .inSeconds;
+        countdownSeconds = getPrefInSeconds;
         timerState.add(TimerStatus.initial);
         break;
       case TimerAction.run:
         if (countdownSeconds == 0) {
-          countdownSeconds =
-              Duration(seconds: prefSec, minutes: prefMin, hours: prefHour)
-                  .inSeconds;
+          countdownSeconds = getPrefInSeconds;
           if (countdownSeconds == 0) {
             Scaffold.of(context)
                 .showSnackBar(SnackBar(content: Text("Set the timer first!")));
@@ -91,31 +86,35 @@ class _TimerScreenState extends State<TimerScreen> {
       body: CustomScrollView(
         slivers: [
           const SliverToBoxAdapter(
-            child: const SizedBox(height: 10),
+            child: const SizedBox(height: 50),
           ),
           SliverToBoxAdapter(
             child: SizedBox(
-              height: 250,
+              height: 300,
               child: Stack(
                 children: [
-                  AnimatedOpacity(
-                    duration: const Duration(milliseconds: 160),
-                    opacity: timerStatus == TimerStatus.initial ? 1 : 0,
-                    curve: Curves.linear,
-                    child: TimerPicker(
-                      hour: prefHour,
-                      minute: prefMin,
-                      second: prefSec,
-                      valChanged: (String units, int index) =>
-                          timerPickerChanged(units, index),
-                    ),
-                  ),
                   AnimatedOpacity(
                     duration: const Duration(milliseconds: 160),
                     curve: Curves.linear,
                     opacity: timerStatus == TimerStatus.initial ? 0 : 1,
                     child: TimerCountdown(
                       timerStateController: timerState,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 48.0),
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 160),
+                      opacity: timerStatus == TimerStatus.initial ? 1 : 0,
+                      curve: Curves.linear,
+                      child: TimerPicker(
+                        active: timerStatus == TimerStatus.initial,
+                        hour: prefHour,
+                        minute: prefMin,
+                        second: prefSec,
+                        valChanged: (String units, int index) =>
+                            timerPickerChanged(units, index),
+                      ),
                     ),
                   ),
                 ],
