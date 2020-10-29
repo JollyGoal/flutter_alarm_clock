@@ -4,15 +4,15 @@ import 'models/models.dart';
 
 List<WorldTime> worldTimeList = [
   WorldTime(
-      location: "Atlantic/Azores", utcOffset: UtcOffset(sign: "+", hours: 0)),
+      location: "Atlantic/Azores", utcOffset: UtcOffset(sign: "-", hours: 1)),
   WorldTime(
       location: "Asia/Tashkent", utcOffset: UtcOffset(sign: "+", hours: 5)),
   WorldTime(
       location: "Europe/London",
-      utcOffset: UtcOffset(sign: "-", hours: 1, minutes: 30)),
-  WorldTime(location: "GGGGGG", utcOffset: UtcOffset(sign: "+", hours: 1)),
+      utcOffset: UtcOffset(sign: "+", hours: 0, minutes: 0)),
+  WorldTime(location: "Tokyo", utcOffset: UtcOffset(sign: "+", hours: 9)),
   WorldTime(
-      location: "Europe/Berlin", utcOffset: UtcOffset(sign: "-", hours: 2)),
+      location: "Europe/Berlin", utcOffset: UtcOffset(sign: "+", hours: 1)),
 ];
 
 List<Alarm> alarmsList = [

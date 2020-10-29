@@ -45,7 +45,7 @@ class _NavScreenState extends State<NavScreen> {
   void initState() {
     _activePage = keys[0];
     _scrollController = ScrollController(keepScrollOffset: true);
-    _pageController = PageController(keepPage: true, initialPage: 3);
+    _pageController = PageController(keepPage: true, initialPage: 0);
     super.initState();
   }
 
